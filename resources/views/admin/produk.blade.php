@@ -81,6 +81,7 @@
                         <th>ID</th>
                         <th>Nama Produk</th>
                         <th>Gambar</th>
+                        <th>Deskripsi</th>
                         <th>Kategori</th>
                         <th>Harga</th>
                         <th>Stok</th>
@@ -93,9 +94,15 @@
                             <td>{{ $item->id_produk }}</td>
                             <td>{{ $item->nama_produk }}</td>
                             <td>
-                                <img src="{{ asset('images/produk/' . $item->gambar) }}" alt="{{ $item->nama_produk }}" 
-                                    class="img-thumbnail" style="max-height: 80px;">
+                                <img src="{{ asset('images/produk/' . $item->gambar) }}" 
+                                     alt="{{ $item->nama_produk }}" 
+                                     class="img-thumbnail" 
+                                     style="max-height: 80px; cursor: pointer;"
+                                     data-bs-toggle="modal"
+                                     data-bs-target="#imageModal"
+                                     onclick="showImage('{{ asset('images/produk/' . $item->gambar) }}')">
                             </td>
+                            <td>{{$item->deskripsi}}</td>
                             <td>{{ $item->kategori->kategori ?? 'Tidak ada kategori' }}</td>
                             <td>Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
                             <td>{{ $item->stok }}</td>
@@ -113,6 +120,22 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+    </div>
+
+
+
+    <!-- Modal untuk menampilkan gambar besar -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: fit-content;">
+          <div class="modal-content border-0 bg-transparent shadow-none position-relative">
+            <div class="modal-body p-0 text-center">
+              <!-- Tombol X -->
+              <button type="button" class="btn-close bg-light position-absolute top-0 end-0 m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+              <!-- Gambar besar -->
+              <img id="modalImage" src="" alt="Gambar Produk" class="img-fluid rounded">
+            </div>
+          </div>
         </div>
     </div>
 
@@ -193,6 +216,12 @@
             </div>
         </div>
     @endforeach
+    <!-- Script untuk mengganti gambar di modal -->
+    <script>
+        function showImage(src) {
+            document.getElementById('modalImage').src = src;
+        }
+    </script>
 
     <!-- SweetAlert2 Script -->
     <script>

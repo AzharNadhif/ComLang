@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Apr 21, 2025 at 02:48 PM
+-- Generation Time: Apr 21, 2025 at 03:33 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -291,9 +291,19 @@ CREATE TABLE `produk` (
 
 INSERT INTO `produk` (`id_produk`, `nama_produk`, `gambar`, `deskripsi`, `harga`, `id_kategori`, `stok`) VALUES
 (1, 'Jersey England', 'england.jpg', 'Jersey England keluaran tahun 2004', 750000.00, 1, 50),
-(2, 'Jaket Denim', 'jaket.jpg', 'Jaket denim klasik', 300000.00, 2, 30),
-(3, 'Jersey Persib', 'persib.jpg', 'sdadasd', 1237964.00, 1, 21),
-(4, 'Jersey Persija', 'persija-1744905067.jpg', 'Jersey kemenangan', 450000.00, 1, 32);
+(4, 'Jersey Persija', 'persija-1744905067.jpg', 'Jersey kemenangan', 450000.00, 1, 32),
+(6, 'Vintage Marvel X-Men Mad Engine', 'vintage-marvel-x-men-mad-engine-1745241045.png', 'one of the best madengine shirts in my opinion', 450000.00, 3, 1),
+(7, 'Vintage Stussy Knowledge Is King', 'vintage-stussy-knowledge-is-king-1745241099.png', 'one of the most popular stussy in Indonesia because it is used by Iqbaal Ramadhan. and one of the rarest because it was released in the 80s', 1500000.00, 3, 1),
+(8, 'Vintage Dragon Ball Z', 'vintage-dragon-ball-z-1745241165.png', 'Anime t-shirts that are expensive and popular in Indonesia are one of the dbz t-shirts', 670000.00, 3, 2),
+(9, 'Vintage Pokemon Charizard', 'vintage-pokemon-charizard-1745241204.png', 'the second most expensive t-shirt I\'ve ever owned', 950000.00, 3, 1),
+(10, 'Special Marvel Event Shirt 2002', 'special-marvel-event-shirt-2002-1745241244.png', 'Wolverine & Spiderman special marvel event shirt. Guest of Honor : Marc Silvestri Special Guest : Stan \"The Man\" Lee', 999999.00, 3, 1),
+(11, 'Vintage 8 Mile Eminem', 'vintage-8-mile-eminem-1745241283.png', 'one of the best rapper movies in the world and the best rapper eminem in the world in my opinion', 1200000.00, 3, 1),
+(12, 'Stussy X Marvel 2011', 'stussy-x-marvel-2011-1745241326.png', 'the best stussy collab so far', 2500000.00, 3, 1),
+(13, 'Vintage PowerPuffGirl', 'vintage-powerpuffgirl-1745241366.png', 'cute t-shirt but anyone can wear it', 780000.00, 3, 1),
+(14, 'Raptee Funky Kong 90s', 'raptee-funky-kong-90s-1745241404.png', 'a donkey kong shirt that becomes funky kong with a design like a raptee shirt. Grail💎', 2300000.00, 3, 1),
+(15, 'Stussy Hoodie', 'stussy-hoodie-1745241441.png', 'besides t-shirts we also sell the best hoodies in the world', 2800000.00, 2, 1),
+(16, 'Vintage Dragon Ball Z All Character', 'vintage-dragon-ball-z-all-character-1745241482.png', 'I really like the dbz t-shirt design', 790000.00, 3, 1),
+(17, 'Vintage Spawn Official', 'vintage-spawn-official-1745241512.png', 'Spawn\'s vintage t-shirt that has a history is really exciting for me', 670000.00, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -327,7 +337,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('80SXGBqbjRLkeJFLmvU8Hdainc4tpuZY50ZJUgfR', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiVFY3dlREcHdxbFJKVTBlQXA4YjB5OUpFZ1RlSnllSkZFUE52alNGZCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9wZXNhbmFuIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czoxNToiYWRtaW5fbG9nZ2VkX2luIjtiOjE7czo4OiJhZG1pbl9pZCI7aToxO30=', 1745231756);
+('eNJucUUb8B88xCBj0wE1dFpm7Mo7hiqoe7VjMP22', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiUFllUXA2ZjE0MWpydDJFQ3JybE51NFdMMXpqbWZPNlFnTW14MGJsSSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9wcm9kdWsiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjE1OiJhZG1pbl9sb2dnZWRfaW4iO2I6MTtzOjg6ImFkbWluX2lkIjtpOjE7fQ==', 1745242311);
 
 -- --------------------------------------------------------
 
@@ -619,7 +629,7 @@ ALTER TABLE `pesanans`
 -- AUTO_INCREMENT for table `produk`
 --
 ALTER TABLE `produk`
-  MODIFY `id_produk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_produk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `produks`
