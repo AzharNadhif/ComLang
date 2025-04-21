@@ -20,8 +20,10 @@ Route::middleware(['authentication'])->group(function(){
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
+
+
 // Route admin yang membutuhkan autentikasi
-Route::middleware(['authorization'])->group(function(){
+Route::middleware(['admin'])->group(function(){
 
     //Dashboard
     Route::get('/admin', [DashboardController::class, 'index'])->name('admin'); //Dashboard
@@ -33,7 +35,7 @@ Route::middleware(['authorization'])->group(function(){
     Route::get('/admin/accounts/create', [AdminController::class, 'create'])->name('admin.accounts.create');
     Route::post('/admin/accounts', [AdminController::class, 'store'])->name('admin.accounts.store');
     // Mengedit admin
-    Route::put('/admin/accounts/{id_admin}', [AdminController::class, 'update'])->name('admin.accounts.update');
+    // Route::put('/admin/accounts/{id_admin}', [AdminController::class, 'update'])->name('admin.accounts.update');
 
 
     // Kategori
@@ -78,6 +80,11 @@ Route::middleware(['authorization'])->group(function(){
     Route::get('/admin/pesanan', [PesananController::class, 'index'])->name('admin.pesanan');
     // Mengupdate status pesanan
     Route::put('/admin/pesanan/{id}', [PesananController::class, 'update'])->name('admin.pesanan.update');
+
+
+    // Profile
+    Route::get('/admin/profile', [AdminController::class, 'show'])->name('admin.profile');
+    Route::put('/admin/profile', [AdminController::class, 'update'])->name('admin.accounts.update');
 
 
 });

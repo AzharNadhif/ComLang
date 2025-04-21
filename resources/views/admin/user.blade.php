@@ -2,11 +2,11 @@
 
 @section('content')
     <div class="container">
-        <h1>Manajemen User</h1>
-
+        <h1 class="fw-bold fs-3">Manajemen User</h1>
+        <br>
         <!-- Daftar Kategori -->
-        <table class="table">
-            <thead>
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
                 <tr>
                     <th>ID</th>
                     <th>Nama User</th>

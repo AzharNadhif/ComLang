@@ -2,12 +2,13 @@
 
 @section('content')
     <div class="container">
-        <h1>Manajemen Produk</h1>
-
-        <!-- Button to trigger modal -->
-        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addProdukModal">
-            Tambah Produk
-        </button>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold fs-3">Manajemen Produk</h1>
+            <!-- Button to trigger modal -->
+            <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addProdukModal">
+                <i class="bi bi-plus-circle me-2"> </i> Tambah Produk
+            </button>
+        </div>
 
         <!-- Modal Add Produk -->
         <div class="modal fade" id="addProdukModal" tabindex="-1" aria-labelledby="addProdukModalLabel" aria-hidden="true">
@@ -74,8 +75,8 @@
 
         <!-- Daftar Produk -->
         <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
                     <tr>
                         <th>ID</th>
                         <th>Nama Produk</th>

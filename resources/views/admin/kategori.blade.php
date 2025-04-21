@@ -2,12 +2,14 @@
 
 @section('content')
     <div class="container">
-        <h1>Manajemen Kategori</h1>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold fs-3">Manajemen Kategori</h1>
 
-        <!-- Button to trigger modal -->
-        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addKategoriModal">
-            Tambah Kategori
-        </button>
+            <!-- Button to trigger modal -->
+            <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addKategoriModal">
+                <i class="bi bi-plus-circle me-2"> </i> Tambah Kategori
+            </button>
+        </div>
 
         <!-- Modal Add Kategori -->
         <div class="modal fade" id="addKategoriModal" tabindex="-1" aria-labelledby="addKategoriModalLabel" aria-hidden="true">
@@ -36,8 +38,8 @@
         </div>
 
         <!-- Daftar Kategori -->
-        <table class="table">
-            <thead>
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
                 <tr>
                     <th>ID</th>
                     <th>Nama Kategori</th>

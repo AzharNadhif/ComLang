@@ -2,12 +2,14 @@
 
 @section('content')
     <div class="container">
-        <h1>Admin Accounts</h1>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold fs-3">Admin Accounts</h1>
 
-        <!-- Button to trigger modal -->
-        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addAdminModal">
-            Add Admin
-        </button>
+            <!-- Button to trigger modal -->
+            <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+                <i class="bi bi-plus-circle me-2"> </i> Add Admin
+            </button>
+        </div>
 
         <!-- Modal Add Admin -->
         <div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
@@ -41,12 +43,12 @@
         </div>
 
         <!-- Daftar Admin -->
-        <table class="table">
-            <thead>
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
                 <tr>
                     <th>Username</th>
                     <th>Password</th>
-                    <th>Actions</th>
+                    {{-- <th>Actions</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -54,9 +56,9 @@
                     <tr>
                         <td>{{ $admin->username }}</td>
                         <td>{{ $admin->password }}</td>
-                        <td>
+                        {{-- <td>
                             <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editAdminModal{{ $admin->id_admin }}">Edit</button>
-                        </td>
+                        </td> --}}
                     </tr>
                 @endforeach
             </tbody>

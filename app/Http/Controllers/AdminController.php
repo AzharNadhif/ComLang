@@ -52,9 +52,12 @@ class AdminController extends Controller
 
 
     // Memperbarui data admin
-    public function update(Request $request, $id_admin)
+    public function update(Request $request)
     {
         try {
+            // Ambil ID admin dari session
+            $id_admin = session('admin_id');
+
             // Validasi input
             $request->validate([
                 'username' => 'required|max:255|unique:admin,username,' . $id_admin . ',id_admin',
@@ -65,9 +68,9 @@ class AdminController extends Controller
                 'password.min' => 'Password harus memiliki minimal 8 karakter.',
             ]);
 
-            // Ambil data admin berdasarkan ID
+            // Ambil data admin berdasarkan ID dari session
             $admin = Admin::findOrFail($id_admin);
-            
+
             // Update username
             $admin->username = $request->username;
 
@@ -80,13 +83,21 @@ class AdminController extends Controller
             $admin->save();
 
             // Flash message sukses
-            session()->flash('success', 'Admin berhasil diperbarui!');
+            session()->flash('success', 'Profil berhasil diperbarui!');
             
         } catch (\Exception $e) {
-            session()->flash('error', 'Gagal memperbarui admin! ' . $e->getMessage());
+            session()->flash('error', 'Gagal memperbarui profil! ' . $e->getMessage());
         }
         
-        return redirect()->route('admin.accounts');
+        return redirect()->route('admin.profile');
+    }
+
+
+    // Profile admin
+    public function show()
+    {
+        $admin = Admin::find(session('admin_id'));
+        return view('admin.profile', compact('admin'));
     }
 
 }

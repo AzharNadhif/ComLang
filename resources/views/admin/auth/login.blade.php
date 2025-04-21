@@ -130,8 +130,8 @@
         <div class="login-container">
             <div class="card">
                 <div class="login-header">
-                    <h2>Log In to Comot</h2>
-                    <p>Quick & Simple way to Activate your account</p>
+                    <h2>Log In to Comot Langsung</h2>
+                    <p>Hello Admin, Kelola data Comot Langsung</p>
                 </div>
                 
                 <form method="POST" action="{{ route('login.process') }}">

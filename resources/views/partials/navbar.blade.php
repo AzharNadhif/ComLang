@@ -21,7 +21,9 @@
         <!-- User Icon -->
         <div class="absolute right-0 flex items-center gap-4">
             <button class="text-gray-500 hover:text-gray-700">
-                <i class="fas fa-user-circle text-xl"></i>
+                <a href="{{ route('admin.profile') }}">
+                    <i class="fas fa-user-circle text-xl"></i>
+                </a>
             </button>
         </div>
     </div>

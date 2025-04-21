@@ -2,8 +2,8 @@
 
 @section('content')
     <div class="container">
-        <h1>Manajemen Pesanan</h1>
-
+        <h1 class="fw-bold fs-3">Manajemen Pesanan</h1>
+        <br>
         <!-- Daftar Pesanan -->
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
