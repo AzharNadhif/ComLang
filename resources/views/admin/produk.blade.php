@@ -3,10 +3,10 @@
 @section('content')
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold fs-3">Manajemen Produk</h1>
+            <h1 class="fw-bold fs-3">Product Management</h1>
             <!-- Button to trigger modal -->
             <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addProdukModal">
-                <i class="bi bi-plus-circle me-2"> </i> Tambah Produk
+                <i class="bi bi-plus-circle me-2"> </i> Add Product
             </button>
         </div>
 
@@ -15,7 +15,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addProdukModalLabel">Tambahkan Produk Baru</h5>
+                        <h5 class="modal-title" id="addProdukModalLabel">Add New Product</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -24,20 +24,20 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="nama_produk">Nama Produk</label>
+                                        <label for="nama_produk">Product Name</label>
                                         <input type="text" name="nama_produk" id="nama_produk" class="form-control" required>
                                     </div>
                                     
                                     <div class="form-group mb-3">
-                                        <label for="gambar">Gambar Produk</label>
+                                        <label for="gambar">Product Image</label>
                                         <input type="file" name="gambar" id="gambar" class="form-control" required accept="image/*">
-                                        <small class="text-muted">Ukuran maksimal: 2MB. Format: JPG, PNG, GIF</small>
+                                        <small class="text-muted">Max Size: 2MB. Format: JPG, PNG, GIF</small>
                                     </div>
                                     
                                     <div class="form-group mb-3">
-                                        <label for="id_kategori">Kategori</label>
+                                        <label for="id_kategori">Category</label>
                                         <select name="id_kategori" id="id_kategori" class="form-control" required>
-                                            <option value="">-- Pilih Kategori --</option>
+                                            <option value="">-- Choose Category --</option>
                                             @foreach($kategori as $kat)
                                                 <option value="{{ $kat->id_kategori }}">{{ $kat->kategori }}</option>
                                             @endforeach
@@ -47,7 +47,7 @@
                                 
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="harga">Harga (Rp)</label>
+                                        <label for="harga">Price (Rp)</label>
                                         <input type="number" name="harga" id="harga" class="form-control" required min="0">
                                     </div>
                                     
@@ -57,15 +57,15 @@
                                     </div>
                                     
                                     <div class="form-group mb-3">
-                                        <label for="deskripsi">Deskripsi</label>
+                                        <label for="deskripsi">Description</label>
                                         <textarea name="deskripsi" id="deskripsi" rows="4" class="form-control"></textarea>
                                     </div>
                                 </div>
                             </div>
                         
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-primary">Tambah Produk</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Add Product</button>
                             </div>
                         </form>
                     </div>
@@ -79,12 +79,12 @@
                 <thead class="table-dark">
                     <tr>
                         <th>ID</th>
-                        <th>Nama Produk</th>
-                        <th>Gambar</th>
-                        <th>Deskripsi</th>
-                        <th>Kategori</th>
-                        <th>Harga</th>
-                        <th>Stok</th>
+                        <th>Product Name</th>
+                        <th>Image</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -109,7 +109,7 @@
                             <td>
                                 <button class="btn btn-warning btn-sm" data-bs-toggle="modal" 
                                     data-bs-target="#editProdukModal{{ $item->id_produk }}">Edit</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteProduk({{ $item->id_produk }})">Hapus</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteProduk({{ $item->id_produk }})">Delete</button>
                                 <form id="delete-form-{{ $item->id_produk }}" action="{{ route('admin.produk.destroy', $item->id_produk) }}" 
                                     method="POST" style="display: none;">
                                     @csrf
@@ -146,7 +146,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editProdukModalLabel{{ $item->id_produk }}">Edit Produk</h5>
+                        <h5 class="modal-title" id="editProdukModalLabel{{ $item->id_produk }}">Edit Product</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -156,16 +156,16 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="nama_produk{{ $item->id_produk }}">Nama Produk</label>
+                                        <label for="nama_produk{{ $item->id_produk }}">Product Name</label>
                                         <input type="text" name="nama_produk" id="nama_produk{{ $item->id_produk }}" 
                                             class="form-control" value="{{ $item->nama_produk }}" required>
                                     </div>
                                     
                                     <div class="form-group mb-3">
-                                        <label for="gambar{{ $item->id_produk }}">Gambar Produk</label>
+                                        <label for="gambar{{ $item->id_produk }}">Image Product</label>
                                         <input type="file" name="gambar" id="gambar{{ $item->id_produk }}" 
                                             class="form-control" accept="image/*">
-                                        <small class="text-muted">Kosongkan jika tidak ingin mengubah gambar</small>
+                                        <small class="text-muted">Leave blank if you don't want to change the image.</small>
                                         <div class="mt-2">
                                             <img src="{{ asset('images/produk/' . $item->gambar) }}" alt="{{ $item->nama_produk }}" 
                                                 class="img-thumbnail" style="max-height: 100px;">
@@ -173,7 +173,7 @@
                                     </div>
                                     
                                     <div class="form-group mb-3">
-                                        <label for="id_kategori{{ $item->id_produk }}">Kategori</label>
+                                        <label for="id_kategori{{ $item->id_produk }}">Category</label>
                                         <select name="id_kategori" id="id_kategori{{ $item->id_produk }}" class="form-control" required>
                                             @foreach($kategori as $kat)
                                                 <option value="{{ $kat->id_kategori }}" 
@@ -187,19 +187,19 @@
                                 
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="harga{{ $item->id_produk }}">Harga (Rp)</label>
+                                        <label for="harga{{ $item->id_produk }}">Price (Rp)</label>
                                         <input type="number" name="harga" id="harga{{ $item->id_produk }}" 
                                             class="form-control" value="{{ $item->harga }}" required min="0">
                                     </div>
                                     
                                     <div class="form-group mb-3">
-                                        <label for="stok{{ $item->id_produk }}">Stok</label>
+                                        <label for="stok{{ $item->id_produk }}">Stock</label>
                                         <input type="number" name="stok" id="stok{{ $item->id_produk }}" 
                                             class="form-control" value="{{ $item->stok }}" required min="0">
                                     </div>
                                     
                                     <div class="form-group mb-3">
-                                        <label for="deskripsi{{ $item->id_produk }}">Deskripsi</label>
+                                        <label for="deskripsi{{ $item->id_produk }}">Description</label>
                                         <textarea name="deskripsi" id="deskripsi{{ $item->id_produk }}" 
                                             rows="4" class="form-control">{{ $item->deskripsi }}</textarea>
                                     </div>
@@ -207,8 +207,8 @@
                             </div>
                         
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-primary">Update Produk</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Update</button>
                             </div>
                         </form>
                     </div>
