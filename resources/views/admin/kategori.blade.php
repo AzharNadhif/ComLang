@@ -3,11 +3,11 @@
 @section('content')
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold fs-3">Manajemen Kategori</h1>
+            <h1 class="fw-bold fs-3">Category Management</h1>
 
             <!-- Button to trigger modal -->
             <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addKategoriModal">
-                <i class="bi bi-plus-circle me-2"> </i> Tambah Kategori
+                <i class="bi bi-plus-circle me-2"> </i> Add Category
             </button>
         </div>
 
@@ -16,7 +16,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addKategoriModalLabel">Tambahkan Kategori Baru</h5>
+                        <h5 class="modal-title" id="addKategoriModalLabel">Add New Category</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -29,7 +29,7 @@
                         
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-primary">Tambah Kategori</button>
+                                <button type="submit" class="btn btn-primary">Add Category</button>
                             </div>
                         </form>
                     </div>
@@ -42,8 +42,8 @@
             <thead class="table-dark">
                 <tr>
                     <th>ID</th>
-                    <th>Nama Kategori</th>
-                    <th>Jumlah Produk</th>
+                    <th>Category</th>
+                    <th>Number ofProduct</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -55,7 +55,7 @@
                         <td>{{ $kat->products->count() }}</td>
                         <td>
                             <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editKategoriModal{{ $kat->id_kategori }}">Edit</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteKategori({{ $kat->id_kategori }})">Hapus</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteKategori({{ $kat->id_kategori }})">Delete</button>
                             <form id="delete-form-{{ $kat->id_kategori }}" action="{{ route('admin.kategori.destroy', $kat->id_kategori) }}" method="POST" style="display: none;">
                                 @csrf
                                 @method('DELETE')

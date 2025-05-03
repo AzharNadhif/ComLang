@@ -3,10 +3,10 @@
 @section('content')
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold fs-3 mb-0">Manajemen Status</h1>
+            <h1 class="fw-bold fs-3 mb-0">Status Management</h1>
             <!-- Button to trigger modal -->
             <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addStatusModal">
-                <i class="bi bi-plus-circle me-2"></i> Tambah Status
+                <i class="bi bi-plus-circle me-2"></i> Add Status
             </button>
         </div>        
 
@@ -15,20 +15,20 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addStatusModalLabel">Tambahkan Status Baru</h5>
+                        <h5 class="modal-title" id="addStatusModalLabel">Add New Status</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form action="{{ route('admin.status.store') }}" method="POST">
                             @csrf
                             <div class="form-group mb-3">
-                                <label for="status">Nama Status</label>
+                                <label for="status">Status </label>
                                 <input type="text" name="nama_status" id="nama_ status" class="form-control" required>
                             </div>
                         
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-primary">Tambah Status</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Add Status</button>
                             </div>
                         </form>
                     </div>
@@ -41,7 +41,7 @@
             <thead class="table-dark">
                 <tr>
                     <th>ID</th>
-                    <th>Nama Status</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -52,7 +52,7 @@
                         <td>{{ $sta->nama_status }}</td>
                         <td>
                             <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editStatusModal{{ $sta->id_status }}">Edit</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteStatus({{ $sta->id_status }})">Hapus</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteStatus({{ $sta->id_status }})">Delete</button>
                             <form id="delete-form-{{ $sta->id_status }}" action="{{ route('admin.status.destroy', $sta->id_status) }}" method="POST" style="display: none;">
                                 @csrf
                                 @method('DELETE')
@@ -78,12 +78,12 @@
                             @csrf
                             @method('PUT')
                             <div class="form-group mb-3">
-                                <label for="status">Nama Status </label>
+                                <label for="status">Status </label>
                                 <input type="text" name="nama_status" id="nama_status" class="form-control" value="{{ $sta->nama_status }}" required>
                             </div>
                             
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                 <button type="submit" class="btn btn-primary">Update Status</button>
                             </div>
                         </form>

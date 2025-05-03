@@ -9,14 +9,14 @@
             <table class="table table-bordered table-striped">
                 <thead class="table-dark">
                     <tr>
-                        <th>ID Pesanan</th>
-                        <th>ID User</th>
+                        <th>Order ID</th>
+                        <th>User ID</th>
                         <th>Status</th>
                         <th>Total</th>
-                        <th>Jumlah Bayar</th>
-                        <th>Bukti Bayar</th>
-                        <th>Tanggal Pesanan</th>
-                        <th>Alamat</th>
+                        <th>Amount Paid</th>
+                        <th>Payment Screenshot</th>
+                        <th>Order Date</th>
+                        <th>Address</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -93,7 +93,7 @@
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="buktiModalLabel{{ $order->id_pesanan }}">Bukti Pembayaran Pesanan #{{ $order->id_pesanan }}</h5>
+                            <h5 class="modal-title" id="buktiModalLabel{{ $order->id_pesanan }}">Payment Proof Screenshot #{{ $order->id_pesanan }}</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body text-center">
@@ -122,7 +122,7 @@
                             @csrf
                             @method('PUT')
                             <div class="form-group mb-3">
-                                <label for="id_status">Status Pesanan</label>
+                                <label for="id_status">Order Status</label>
                                 <select name="id_status" id="id_status" class="form-select" required>
                                     @foreach($status as $stat)
                                         <option value="{{ $stat->id_status }}" {{ $order->id_status == $stat->id_status ? 'selected' : '' }}>
