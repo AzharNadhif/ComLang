@@ -9,6 +9,12 @@ use App\Http\Controllers\PesananController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\KatalogController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\UserAuthController;
+use App\Http\Controllers\KeranjangController;
+use App\Http\Controllers\RekomendasiController;
+use App\Http\Controllers\ContactController;
 
 
 
@@ -18,6 +24,91 @@ Route::middleware(['authentication'])->group(function(){
     Route::post('/login', [LoginController::class, 'authenticate'])->name('login.process');
 });
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('/', function () {
+    return view('index');
+})->name('home');
+
+Route::get('/about', function () {
+    return view('about'); // Sesuaikan dengan nama view yang diinginkan
+})->name('about');
+
+Route::get('/contact', function () {
+    return view('contact'); // Sesuaikan dengan nama view yang diinginkan
+})->name('contact');
+
+Route::get('/shop', function () {
+    return view('shop'); // Sesuaikan dengan nama view yang diinginkan
+})->name('shop');
+
+Route::get('/', [RekomendasiController::class, 'index'])->name('home');
+
+Route::get('/shop', [KatalogController::class, 'index'])->name('shop');
+Route::get('/shop/filter/{id_kategori}', [KatalogController::class, 'filterByKategori'])->name('shop.filter');
+Route::get('/shop/all', [KatalogController::class, 'allProduk']);
+
+
+
+Route::get('/produk/{id}', [KatalogController::class, 'show'])->name('produk.detail');
+
+
+Route::get('/checkout/cart', [CheckoutController::class, 'cartForm'])->name('checkout.cart.form');
+Route::post('/checkout/cart/upload', [CheckoutController::class, 'cartUploadForm'])->name('checkout.cart.upload');
+Route::post('/checkout/cart/process', [CheckoutController::class, 'prosesCart'])->name('checkout.cart.process');
+
+
+Route::get('/checkout/{id_produk}', [CheckoutController::class, 'form'])->name('checkout.show');
+Route::post('/checkout/simpan', [CheckoutController::class, 'simpanPesanan'])->name('checkout.simpan');
+Route::get('/checkout/upload/{id}', [CheckoutController::class, 'uploadBukti'])->name('checkout.upload');
+Route::post('/checkout/upload', [CheckoutController::class, 'simpanBukti'])->name('checkout.upload.simpan');
+
+// Route login user
+Route::get('/user/login', [UserAuthController::class, 'formLogin'])->name('user.login.form');
+Route::post('/user/login', [UserAuthController::class, 'login'])->name('user.login');
+
+// Route register user
+Route::get('/user/register', [UserAuthController::class, 'formRegister'])->name('user.register.form');
+Route::post('/user/register', [UserAuthController::class, 'register'])->name('user.register.store');
+
+// Logout user
+Route::post('/user/logout', [UserAuthController::class, 'logout'])->name('user.logout');
+
+Route::middleware('auth:webuser')->group(function () {
+    Route::get('/profil', [UserController::class, 'profil'])->name('profil');
+});
+
+Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
+Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('user.profile.edit');
+Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('user.profile.update');
+Route::get('/profile/orders', [UserController::class, 'riwayatPesanan'])->name('user.orders');
+Route::delete('/profile/orders/{id}', [UserController::class, 'hapusPesanan'])->name('user.orders.delete');
+
+Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang.index');
+Route::post('/keranjang/tambah/{id_produk}', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
+Route::delete('/keranjang/{id}', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
+
+
+Route::post('/contact/send', [ContactController::class, 'send'])->name('contact.send');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -43,13 +43,34 @@
                                 @endif
                             </td>
                             <td>
-                                @if($order->pembayaran && $order->pembayaran->bukti_bayar)
-                                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#buktiModal{{ $order->id_pesanan }}">
-                                        <i class="bi bi-image"></i> Lihat Bukti
-                                    </button>
-                                @else
-                                    <span class="text-danger">Tidak ada</span>
-                                @endif
+@if($order->pembayaran && $order->pembayaran->bukti_bayar)
+    <div class="d-flex gap-1">
+        {{-- Tombol Lihat --}}
+        <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#buktiModal{{ $order->id_pesanan }}">
+            <i class="bi bi-image"></i> Lihat Bukti
+        </button>
+
+        {{-- Tombol Download --}}
+        <a href="{{ asset($order->pembayaran->bukti_bayar) }}" download class="btn btn-success btn-sm">
+            <i class="bi bi-download"></i> Download
+        </a>
+    </div>
+
+    {{-- Modal untuk lihat bukti --}}
+    <div class="modal fade" id="buktiModal{{ $order->id_pesanan }}" tabindex="-1" aria-labelledby="buktiModalLabel{{ $order->id_pesanan }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <img src="{{ asset($order->pembayaran->bukti_bayar) }}" class="img-fluid rounded" alt="Bukti Pembayaran">
+                </div>
+            </div>
+        </div>
+    </div>
+@else
+    <span class="text-danger">Tidak ada</span>
+@endif
+
+
                             </td>
                             <td>{{ date('d-m-Y', strtotime($order->tanggal_pesanan)) }}</td>
                             <td>{{ $order->alamat }}</td>
