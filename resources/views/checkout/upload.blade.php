@@ -22,7 +22,7 @@
 
                     <div class="row align-items-center g-4 mb-4">
                         <div class="col-md-5 text-center">
-                            <img src="{{ asset('images/qris.jpeg') }}" alt="QR Code" class="img-fluid rounded border">
+                            <img src="{{ asset('images/qrisc.png') }}" alt="QR Code" class="img-fluid rounded border">
                         </div>
                         <div class="col-md-7">
                             <ul class="list-unstyled lh-lg">

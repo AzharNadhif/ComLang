@@ -47,7 +47,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center">Belum ada pesanan.</td>
+                            <td colspan="7" class="text-center">No orders yet.</td>
                         </tr>
                     @endforelse
                 </tbody>

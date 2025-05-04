@@ -20,7 +20,7 @@
                 <a href="{{ route('user.profile.edit') }}"
                     class="flex items-center justify-between px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg">
                     <span class="flex items-center gap-2">
-                        <i class="fa-solid fa-user text-blue-500"></i> Profil
+                        <i class="fa-solid fa-user text-blue-500"></i> Profile
                     </span>
                     <i class="fa-solid fa-pen-to-square text-gray-400"></i>
                 </a>

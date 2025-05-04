@@ -21,7 +21,7 @@
 
                     <div class="row align-items-center g-4 mb-4">
                         <div class="col-md-5 text-center">
-                            <img src="{{ asset('images/qris.jpeg') }}" alt="QR Code" class="img-fluid border rounded" style="max-width: 100%;">
+                            <img src="{{ asset('images/qrisc.png') }}" alt="QR Code" class="img-fluid border rounded" style="max-width: 100%;">
                         </div>
                         <div class="col-md-7">
                             <ul class="list-unstyled">
