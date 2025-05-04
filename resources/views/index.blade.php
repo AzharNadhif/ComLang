@@ -176,23 +176,6 @@
             <button class="side-info-close"><i class="fal fa-times"></i></button>
             <div class="side-info-content">
                 <div class="mobile-menu"></div>
-                <div class="contact-infos mb-30">
-                    <div class="contact-list mb-30">
-                        <h4>Office Address</h4>
-                        <p>123/A, Miranda City Likaoli
-                            Prikano, Dope</p>
-                    </div>
-                    <div class="contact-list mb-30">
-                        <h4>Phone Number</h4>
-                        <p>+0989 7876 9865 9</p>
-                        <p>+(090) 8765 86543 85</p>
-                    </div>
-                    <div class="contact-list mb-30">
-                        <h4>Email Address</h4>
-                        <p>info@example.com</p>
-                        <p>example.mail@hum.com</p>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -252,7 +235,7 @@
 
 
     <!-- slider start -->
-    <div class="slider-active swiper-container height">
+    <div class="swiper-container height">
         <div class="swiper-wrapper">
             <div class="swiper-slide slider-item">
                 <div class="container">
@@ -267,8 +250,7 @@
                 </div>
             </div>
         </div>
-        <!-- Add Pagination -->
-        <div class="swiper-pagination"></div>
+
     </div>
     <!-- slider end -->
 
