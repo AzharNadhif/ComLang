@@ -522,6 +522,10 @@
         <script src="assets/js/swiper-bundle.min.js"></script>
         <script src="assets/js/countdown.js"></script>
         <script src="assets/js/main.js"></script>
+        <script>
+            const userLoggedIn = @json(session('user_logged_in', false));
+        </script>
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
        
         <script>
@@ -530,42 +534,63 @@ document.querySelectorAll('.filter-kategori').forEach(item => {
         const id = this.getAttribute('data-id');
         const url = id === 'all' ? '/shop/all' : `/shop/filter/${id}`;
 
-        fetch(url)
-            .then(res => res.json())
-            .then(res => {
-                const container = document.querySelector('#produk-container');
-                container.innerHTML = '';
+fetch(url)
+    .then(res => res.json())
+    .then(res => {
+        const container = document.querySelector('#produk-container');
+        container.innerHTML = '';
 
-                res.data.forEach(produk => {
-                    container.innerHTML += `
-                        <div class="col-xl-4">
-                            <div class="product product-4">
-                                <div class="product__thumb">
-                                    <a href="/produk/${produk.id_produk}">
-                                        <img class="product-primary" src="/images/produk/${produk.gambar}" alt="${produk.nama_produk}" style="width: 100%; height: 300px; object-fit: cover;">
-                                        <img class="product-secondary" src="/images/produk/${produk.gambar}" alt="${produk.nama_produk}">
-                                    </a>
-                                    <div class="product-info mb-10">
-                                        <div class="product_category">
-                                            <span>${produk.kategori?.kategori || '-'}</span>
-                                        </div>
-                                    </div>
-                                    <div class="product__name">
-                                        <h4><a href="#">${produk.nama_produk}</a></h4>
-                                        <div class="pro-price">
-                                            <p class="p-absoulute pr-1">Rp ${parseInt(produk.harga).toLocaleString('id-ID')}</p>
-                                            <a class="p-absoulute pr-2" href="/login">add to cart</a>
-                                        </div>
-                                    </div>
+        res.data.forEach(produk => {
+            const harga = parseInt(produk.harga).toLocaleString('id-ID');
+            const kategori = produk.kategori?.kategori || '-';
+            const gambar = produk.gambar;
+            const nama = produk.nama_produk;
+            const idProduk = produk.id_produk;
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            const addToCart = userLoggedIn
+                ? `
+                    <form action="/keranjang/tambah/${idProduk}" method="POST">
+                        <input type="hidden" name="_token" value="${csrfToken}">
+                        <button type="submit" class="p-absoulute pr-2" style="border: none; background: none; color: #000;">add to cart</button>
+                    </form>
+                `
+                : `
+                    <form>
+                        <a href="/user/login" class="p-absoulute pr-2">add to cart</a>
+                    </form>
+                `;
+
+            container.innerHTML += `
+                <div class="col-xl-4">
+                    <div class="product product-4">
+                        <div class="product__thumb">
+                            <a href="/produk/${idProduk}">
+                                <img class="product-primary" src="/images/produk/${gambar}" alt="${nama}" style="width: 100%; height: 300px; object-fit: cover;">
+                                <img class="product-secondary" src="/images/produk/${gambar}" alt="${nama}">
+                            </a>
+                            <div class="product-info mb-10">
+                                <div class="product_category">
+                                    <span>${kategori}</span>
+                                </div>
+                            </div>
+                            <div class="product__name">
+                                <h4><a href="#">${nama}</a></h4>
+                                <div class="pro-price">
+                                    <p class="p-absoulute pr-1">Rp ${harga}</p>
+                                    ${addToCart}
                                 </div>
                             </div>
                         </div>
-                    `;
-                });
+                    </div>
+                </div>
+            `;
+        });
 
-                // Update jumlah produk ditampilkan
-                document.getElementById('jumlah-produk').innerText = `Showing all ${res.data.length} results`;
-            });
+        document.getElementById('jumlah-produk').innerText = `Showing all ${res.data.length} results`;
+    });
+
     });
 });
 
