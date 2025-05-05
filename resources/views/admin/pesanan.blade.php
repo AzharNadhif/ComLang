@@ -17,6 +17,10 @@
                         <th>Payment Screenshot</th>
                         <th>Order Date</th>
                         <th>Address</th>
+                        <th>Produk</th>
+                        <th>Penerima</th>
+                        <th>No WhatsApp</th>
+                        <th>Kode Pos</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -74,6 +78,25 @@
                             </td>
                             <td>{{ date('d-m-Y', strtotime($order->tanggal_pesanan)) }}</td>
                             <td>{{ $order->alamat }}</td>
+                            <!-- Produk -->
+                            <td>
+                                @if($order->detail && $order->detail->count())
+                                    {{ $order->detail->pluck('produk.nama_produk')->join(', ') }}
+                                @else
+                                    {{ $order->produk->nama_produk ?? '-' }}
+                                @endif
+                            </td>
+
+
+                            <!-- Nama Penerima -->
+                            <td>{{ $order->nama_penerima ?? '-' }}</td>
+
+                            <!-- No WhatsApp -->
+                            <td>{{ $order->whatsapp ?? '-' }}</td>
+
+                            <!-- ZIP Code -->
+                            <td>{{ $order->kode_pos ?? '-' }}</td>
+
                             <td>
                                 <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPesananModal{{ $order->id_pesanan }}">
                                     <i class="bi bi-pencil-square"></i> Update Status

@@ -171,11 +171,14 @@ Route::middleware(['admin'])->group(function(){
     Route::get('/admin/pesanan', [PesananController::class, 'index'])->name('admin.pesanan');
     // Mengupdate status pesanan
     Route::put('/admin/pesanan/{id}', [PesananController::class, 'update'])->name('admin.pesanan.update');
+    Route::delete('/admin/pesanan/{id}', [PesananController::class, 'destroy'])->name('admin.pesanan.destroy');
+
 
 
     // Profile
     Route::get('/admin/profile', [AdminController::class, 'show'])->name('admin.profile');
     Route::put('/admin/profile', [AdminController::class, 'update'])->name('admin.accounts.update');
+    
 
 
 });

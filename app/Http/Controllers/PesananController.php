@@ -14,10 +14,11 @@ class PesananController extends Controller
      */
     public function index()
     {
-        $pesanan = Pesanan::with(['status', 'pembayaran'])->get();
+        $pesanan = Pesanan::with(['status', 'pembayaran', 'user', 'detail.produk', 'produk'])->get();
         $status = Status::all();
         return view('admin.pesanan', compact('pesanan', 'status'));
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -38,4 +39,16 @@ class PesananController extends Controller
             return redirect()->back()->with('error', 'Gagal memperbarui status pesanan! ' . $e->getMessage());
         }
     }
+
+    public function destroy($id)
+    {
+        try {
+            $pesanan = Pesanan::findOrFail($id);
+            $pesanan->delete(); // atau forceDelete jika pakai SoftDeletes
+            return redirect()->back()->with('success', 'Pesanan berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menghapus pesanan! ' . $e->getMessage());
+        }
+    }
+
 }
