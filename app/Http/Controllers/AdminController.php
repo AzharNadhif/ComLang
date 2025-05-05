@@ -38,6 +38,7 @@ class AdminController extends Controller
             Admin::create([
                 'username' => $request->username,
                 'password' => bcrypt($request->password),
+                'role' => 'admin',
             ]);
 
             // Menggunakan session untuk mengirimkan informasi sukses
