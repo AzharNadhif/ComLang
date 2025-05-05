@@ -242,8 +242,8 @@
                     <div class="row">
                         <div class="col-xl-12">
                             <div class="slider_images">
-                                <img class="back" src="./assets/img/slider/cb.png" alt="">
-                                <img class="top" src="./assets/img/slider/text.png" alt="">
+                                <!-- <img class="back" src="./assets/img/slider/cb.png" alt=""> -->
+                                <img class="top" src="./assets/img/slider/p.png" alt="">
                             </div>
                         </div>
                     </div>
@@ -358,7 +358,7 @@
                                                             <img class="product-secondary" src="{{ asset('images/produk/' . $item->gambar) }}" alt="{{ $item->nama_produk }}">
                                                         </a>
                                                         <div class="product__update">
-                                                            <a class="#">new</a>
+                                                            <a class="#">for you</a>
                                                         </div>
                                                         <div class="product-info mb-10">
                                                             <div class="product_category">
