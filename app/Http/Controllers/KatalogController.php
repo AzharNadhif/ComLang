@@ -11,15 +11,28 @@ class KatalogController extends Controller
 {
     public function index()
     {
-        $produks = Produk::with('kategori')->get();
-        $kategoriCounts = Kategori::withCount('products')->get();
-        $totalProduk = $produks->count(); // <-- Tambahkan ini
+        // Ambil produk dengan stok > 0
+        $produks = Produk::with('kategori')
+            ->where('stok', '>', 0)
+            ->get();
+
+        // Hitung jumlah produk per kategori dengan stok > 0
+        $kategoriCounts = Kategori::withCount(['products' => function ($query) {
+            $query->where('stok', '>', 0);
+        }])->get();
+
+        $totalProduk = $produks->count();
+
         return view('shop', compact('produks', 'kategoriCounts', 'totalProduk'));
     }
-    
+
     public function filterByKategori($id_kategori)
     {
-        $produks = Produk::with('kategori')->where('id_kategori', $id_kategori)->get();
+        // Filter berdasarkan kategori dan stok > 0
+        $produks = Produk::with('kategori')
+            ->where('id_kategori', $id_kategori)
+            ->where('stok', '>', 0)
+            ->get();
 
         return response()->json([
             'data' => $produks
@@ -34,12 +47,13 @@ class KatalogController extends Controller
 
     public function allProduk()
     {
-        $produks = Produk::with('kategori')->get();
+        // Ambil semua produk dengan stok > 0
+        $produks = Produk::with('kategori')
+            ->where('stok', '>', 0)
+            ->get();
 
         return response()->json([
             'data' => $produks
         ]);
     }
-
-
 }

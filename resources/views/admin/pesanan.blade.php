@@ -21,6 +21,7 @@
                         <th>Penerima</th>
                         <th>No WhatsApp</th>
                         <th>Kode Pos</th>
+                        <th>Nomor Resi</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -47,63 +48,96 @@
                                 @endif
                             </td>
                             <td>
-@if($order->pembayaran && $order->pembayaran->bukti_bayar)
-    <div class="d-flex gap-1">
-        {{-- Tombol Lihat --}}
-        <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#buktiModal{{ $order->id_pesanan }}">
-            <i class="bi bi-image"></i> Lihat Bukti
-        </button>
+                    @if($order->pembayaran && $order->pembayaran->bukti_bayar)
+                        <div class="d-flex gap-1">
+                            {{-- Tombol Lihat --}}
+                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#buktiModal{{ $order->id_pesanan }}">
+                                <i class="bi bi-image"></i> Lihat Bukti
+                            </button>
 
-        {{-- Tombol Download --}}
-        <a href="{{ asset($order->pembayaran->bukti_bayar) }}" download class="btn btn-success btn-sm">
-            <i class="bi bi-download"></i> Download
-        </a>
-    </div>
+                            {{-- Tombol Download --}}
+                            <a href="{{ asset($order->pembayaran->bukti_bayar) }}" download class="btn btn-success btn-sm">
+                                <i class="bi bi-download"></i> Download
+                            </a>
+                        </div>
 
-    {{-- Modal untuk lihat bukti --}}
-    <div class="modal fade" id="buktiModal{{ $order->id_pesanan }}" tabindex="-1" aria-labelledby="buktiModalLabel{{ $order->id_pesanan }}" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-body text-center">
-                    <img src="{{ asset($order->pembayaran->bukti_bayar) }}" class="img-fluid rounded" alt="Bukti Pembayaran">
-                </div>
-            </div>
-        </div>
-    </div>
-@else
-    <span class="text-danger">Tidak ada</span>
-@endif
-
-
-                            </td>
-                            <td>{{ date('d-m-Y', strtotime($order->tanggal_pesanan)) }}</td>
-                            <td>{{ $order->alamat }}</td>
-                            <!-- Produk -->
-                            <td>
-                                @if($order->detail && $order->detail->count())
-                                    {{ $order->detail->pluck('produk.nama_produk')->join(', ') }}
-                                @else
-                                    {{ $order->produk->nama_produk ?? '-' }}
-                                @endif
-                            </td>
+                        {{-- Modal untuk lihat bukti --}}
+                        <div class="modal fade" id="buktiModal{{ $order->id_pesanan }}" tabindex="-1" aria-labelledby="buktiModalLabel{{ $order->id_pesanan }}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body text-center">
+                                        <img src="{{ asset($order->pembayaran->bukti_bayar) }}" class="img-fluid rounded" alt="Bukti Pembayaran">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <span class="text-danger">Tidak ada</span>
+                    @endif
 
 
-                            <!-- Nama Penerima -->
-                            <td>{{ $order->nama_penerima ?? '-' }}</td>
+                                </td>
+                                <td>{{ date('d-m-Y', strtotime($order->tanggal_pesanan)) }}</td>
+                                <td>{{ $order->alamat }}</td>
+                                <!-- Produk -->
+                                <td>
+                                    @if($order->detail && $order->detail->count())
+                                        {{ $order->detail->pluck('produk.nama_produk')->join(', ') }}
+                                    @else
+                                        {{ $order->produk->nama_produk ?? '-' }}
+                                    @endif
+                                </td>
 
-                            <!-- No WhatsApp -->
-                            <td>{{ $order->whatsapp ?? '-' }}</td>
 
-                            <!-- ZIP Code -->
-                            <td>{{ $order->kode_pos ?? '-' }}</td>
+                                <!-- Nama Penerima -->
+                                <td>{{ $order->nama_penerima ?? '-' }}</td>
 
-                            <td>
-                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPesananModal{{ $order->id_pesanan }}">
-                                    <i class="bi bi-pencil-square"></i> Update Status
-                                </button>
-                            </td>
-                        </tr>
-                    @endforeach
+                                <!-- No WhatsApp -->
+                                <td>{{ $order->whatsapp ?? '-' }}</td>
+
+                                <!-- ZIP Code -->
+                                <td>{{ $order->kode_pos ?? '-' }}</td>
+                               <td>
+                                    <span class="badge bg-success">{{ $order->resi ?? 'Belum Ada Resi' }}</span>
+
+                                    <!-- Tombol buka modal untuk input/edit resi -->
+                                    <button class="btn btn-sm btn-outline-primary mt-1" data-bs-toggle="modal" data-bs-target="#resiModal{{ $order->id_pesanan }}">
+                                        <i class="bi bi-truck"></i> {{ $order->resi ? 'Edit Resi' : 'Input Resi' }}
+                                    </button>
+
+                                    <!-- Modal input/edit resi -->
+                                    <div class="modal fade" id="resiModal{{ $order->id_pesanan }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <form method="POST" action="{{ route('admin.pesanan.resi', $order->id_pesanan) }}">
+                                                    @csrf
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">{{ $order->resi ? 'Edit' : 'Input' }} Nomor Resi</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <label for="resiInput{{ $order->id_pesanan }}" class="form-label">Nomor Resi</label>
+                                                        <input type="text" class="form-control" id="resiInput{{ $order->id_pesanan }}" name="resi" value="{{ $order->resi }}" required>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-success">Simpan</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+</td>
+
+
+
+
+                                <td>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPesananModal{{ $order->id_pesanan }}">
+                                        <i class="bi bi-pencil-square"></i> Update Status
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
                 </tbody>
             </table>
         </div>
@@ -131,6 +165,8 @@
         @endif
     @endforeach
 
+ 
+
     <!-- Modal Edit Status Pesanan -->
     @foreach ($pesanan as $order)
         <div class="modal fade" id="editPesananModal{{ $order->id_pesanan }}" tabindex="-1" aria-labelledby="editPesananModalLabel{{ $order->id_pesanan }}" aria-hidden="true">
@@ -148,11 +184,28 @@
                                 <label for="id_status">Order Status</label>
                                 <select name="id_status" id="id_status" class="form-select" required>
                                     @foreach($status as $stat)
-                                        <option value="{{ $stat->id_status }}" {{ $order->id_status == $stat->id_status ? 'selected' : '' }}>
-                                            {{ $stat->nama_status }}
-                                        </option>
+                                        @php
+                                            $currentStatus = $order->id_status;
+                                            $statusName = strtolower($stat->nama_status);
+                                        @endphp
+
+                                        @if (
+                                            // Jika status saat ini "Belum Bayar", semua pilihan diizinkan
+                                            $currentStatus == 1 ||
+
+                                            // Jika status saat ini "Sedang Diproses", hanya izinkan tetap atau ke "Selesai"
+                                            ($currentStatus == 2 && in_array($stat->id_status, [2, 3])) ||
+
+                                            // Jika status saat ini "Selesai", hanya izinkan tetap di "Selesai"
+                                            ($currentStatus == 3 && $stat->id_status == 3)
+                                        )
+                                            <option value="{{ $stat->id_status }}" {{ $order->id_status == $stat->id_status ? 'selected' : '' }}>
+                                                {{ $stat->nama_status }}
+                                            </option>
+                                        @endif
                                     @endforeach
                                 </select>
+
                             </div>
                             
                             <div class="modal-footer">
@@ -223,5 +276,7 @@
                 });
             });
         });
+
+
     </script>
 @endsection

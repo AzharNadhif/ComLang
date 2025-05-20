@@ -10,6 +10,7 @@ use App\Models\Produk;
 use App\Models\PesananDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
@@ -18,10 +19,16 @@ class CheckoutController extends Controller
     public function form($id_produk)
     {
         if (!session('user_logged_in')) {
-        return redirect()->route('user.login.form')->withErrors(['login' => 'Silakan login terlebih dahulu.']);
+            return redirect()->route('user.login.form')->withErrors(['login' => 'Silakan login terlebih dahulu.']);
         }
 
         $produk = Produk::findOrFail($id_produk);
+        
+        // Validasi stok produk
+        if ($produk->stok <= 0) {
+            return redirect()->back()->with('error', 'Stok produk tidak tersedia.');
+        }
+        
         return view('checkout.form', compact('produk'));
     }
 
@@ -41,17 +48,22 @@ class CheckoutController extends Controller
         ]);
 
         $produk = Produk::findOrFail($request->id_produk);
+        
+        // Validasi stok sekali lagi sebagai pengaman
+        if ($produk->stok <= 0) {
+            return redirect()->back()->with('error', 'Stok produk tidak tersedia.');
+        }
 
         $pesanan = Pesanan::create([
-            'id_user' => session('user_id'), // <<< pakai session
-            'id_produk' => $produk->id_produk, // <<< simpan produk juga
+            'id_user' => session('user_id'),
+            'id_produk' => $produk->id_produk,
             'id_status' => 1, // Menunggu Konfirmasi
             'total' => $produk->harga,
             'tanggal_pesanan' => now(),
             'alamat' => $request->alamat,
-            'nama_penerima' => $request->nama, // <<< kalau kamu mau pakai ini
-            'whatsapp' => $request->whatsapp,  // <<< simpan no WA
-            'kode_pos' => $request->kode_pos,  // <<< simpan kode pos
+            'nama_penerima' => $request->nama,
+            'whatsapp' => $request->whatsapp,
+            'kode_pos' => $request->kode_pos,
         ]);
 
         return redirect()->route('checkout.upload', $pesanan->id_pesanan);
@@ -62,14 +74,14 @@ class CheckoutController extends Controller
     public function uploadBukti($id_pesanan)
     {
         if (!session('user_logged_in')) {
-        return redirect()->route('user.login.form')->withErrors(['login' => 'Silakan login terlebih dahulu.']);
+            return redirect()->route('user.login.form')->withErrors(['login' => 'Silakan login terlebih dahulu.']);
         }
 
         $pesanan = Pesanan::with('pembayaran')->findOrFail($id_pesanan);
         return view('checkout.upload', compact('pesanan'));
     }
 
-    // Simpan bukti bayar
+    // Simpan bukti bayar dan kurangi stok
     public function simpanBukti(Request $request)
     {
         if (!session('user_logged_in')) {
@@ -83,19 +95,46 @@ class CheckoutController extends Controller
 
         $pesanan = Pesanan::findOrFail($request->id_pesanan);
 
-        $file = $request->file('bukti_bayar');
-        $namaFile = 'bukti_transfer_' . $pesanan->id_pesanan . '.' . $file->getClientOriginalExtension();
-        $path = 'images/bukti_bayar/' . $namaFile;
-        $file->move(public_path('images/bukti_bayar'), $namaFile);
+        // Gunakan transaksi database untuk memastikan konsistensi data
+        DB::beginTransaction();
+        
+        try {
+            // Cari produk dan kurangi stok
+            $produk = Produk::findOrFail($pesanan->id_produk);
+            
+            // Cek stok sekali lagi sebelum mengurangi
+            if ($produk->stok <= 0) {
+                throw new \Exception('Stok produk tidak tersedia.');
+            }
+            
+            // Kurangi stok
+            $produk->stok = $produk->stok - 1;
+            $produk->save();
 
-
-        Pembayaran::create([
-            'id_pesanan' => $pesanan->id_pesanan,
-            'jumlah_bayar' => $pesanan->total,
-            'bukti_bayar' => $path,
-        ]);
-
-        return redirect()->route('user.orders')->with('success', 'Pembayaran berhasil diunggah!');
+            // Upload bukti pembayaran
+            $file = $request->file('bukti_bayar');
+            $namaFile = 'bukti_transfer_' . $pesanan->id_pesanan . '.' . $file->getClientOriginalExtension();
+            $path = 'images/bukti_bayar/' . $namaFile;
+            $file->move(public_path('images/bukti_bayar'), $namaFile);
+            
+            // Simpan data pembayaran
+            Pembayaran::create([
+                'id_pesanan' => $pesanan->id_pesanan,
+                'jumlah_bayar' => $pesanan->total,
+                'bukti_bayar' => $path,
+            ]);
+            
+            // Commit transaksi jika semua berhasil
+            DB::commit();
+            
+            return redirect()->route('user.orders')->with('success', 'Pembayaran berhasil diunggah dan stok produk telah diperbarui!');
+            
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi error
+            DB::rollBack();
+            
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function prosesCart(Request $request)
@@ -111,53 +150,77 @@ class CheckoutController extends Controller
         $pengiriman = session('checkout_cart_pengiriman');
         $id_user = session('user_id');
 
-        // Proses upload ke public/images/bukti_bayar/
-        $file = $request->file('bukti_pembayaran');
-        $filename = 'bukti_transfer_' . time() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('images/bukti_bayar'), $filename);
-        $buktiPath = 'images/bukti_bayar/' . $filename;
-
-        // Hitung total semua item keranjang
+        // Dapatkan semua item keranjang
         $items = Keranjang::with('produk')->where('id_user', $id_user)->get();
         $totalPesanan = $items->sum(fn($item) => $item->produk->harga);
-
-        // Buat satu entry pesanan utama
-        $pesanan = Pesanan::create([
-            'id_user' => $id_user,
-            'id_status' => 1,
-            'total' => $totalPesanan,
-            'tanggal_pesanan' => now(),
-            'alamat' => $pengiriman['alamat'],
-            'nama_penerima' => $pengiriman['nama'],
-            'whatsapp' => $pengiriman['whatsapp'],
-            'kode_pos' => $pengiriman['kode_pos'],
-        ]);
-
-        // Tambahkan detail produk ke tabel pesanan_detail
-        foreach ($items as $item) {
-            \App\Models\PesananDetail::create([
-                'id_pesanan' => $pesanan->id_pesanan,
-                'id_produk' => $item->id_produk,
+        
+        // Gunakan transaksi database
+        DB::beginTransaction();
+        
+        try {
+            // Validasi stok semua produk terlebih dahulu
+            foreach ($items as $item) {
+                $produk = Produk::findOrFail($item->id_produk);
+                if ($produk->stok <= 0) {
+                    throw new \Exception("Produk '{$produk->nama_produk}' telah habis stok.");
+                }
+            }
+            
+            // Proses upload bukti pembayaran
+            $file = $request->file('bukti_pembayaran');
+            $filename = 'bukti_transfer_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images/bukti_bayar'), $filename);
+            $buktiPath = 'images/bukti_bayar/' . $filename;
+            
+            // Buat pesanan utama
+            $pesanan = Pesanan::create([
+                'id_user' => $id_user,
+                'id_status' => 1,
+                'total' => $totalPesanan,
+                'tanggal_pesanan' => now(),
+                'alamat' => $pengiriman['alamat'],
+                'nama_penerima' => $pengiriman['nama'],
+                'whatsapp' => $pengiriman['whatsapp'],
+                'kode_pos' => $pengiriman['kode_pos'],
             ]);
+            
+            // Tambahkan detail produk dan kurangi stok
+            foreach ($items as $item) {
+                // Tambahkan ke tabel pesanan_detail
+                PesananDetail::create([
+                    'id_pesanan' => $pesanan->id_pesanan,
+                    'id_produk' => $item->id_produk,
+                ]);
+                
+                // Kurangi stok produk
+                $produk = Produk::findOrFail($item->id_produk);
+                $produk->stok = $produk->stok - 1;
+                $produk->save();
+            }
+            
+            // Simpan bukti pembayaran
+            Pembayaran::create([
+                'id_pesanan' => $pesanan->id_pesanan,
+                'jumlah_bayar' => $totalPesanan,
+                'bukti_bayar' => $buktiPath,
+            ]);
+            
+            // Kosongkan keranjang
+            Keranjang::where('id_user', $id_user)->delete();
+            session()->forget('checkout_cart_pengiriman');
+            
+            // Commit transaksi jika semua berhasil
+            DB::commit();
+            
+            return redirect()->route('user.orders')->with('success', 'Pesanan berhasil dibuat dan stok produk telah diperbarui.');
+            
+        } catch (\Exception $e) {
+            // Rollback jika terjadi error
+            DB::rollBack();
+            
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        // Simpan bukti pembayaran
-        Pembayaran::create([
-            'id_pesanan' => $pesanan->id_pesanan,
-            'jumlah_bayar' => $totalPesanan,
-            'bukti_bayar' => $buktiPath,
-        ]);
-
-        // Kosongkan keranjang & session
-        Keranjang::where('id_user', $id_user)->delete();
-        session()->forget('checkout_cart_pengiriman');
-
-        return redirect()->route('user.orders')->with('success', 'Pesanan berhasil dibuat.');
     }
-
-
-
-
 
     public function cartForm()
     {
@@ -193,9 +256,4 @@ class CheckoutController extends Controller
 
         return view('checkout.cart-upload');
     }
-
-
-
-
-
 }

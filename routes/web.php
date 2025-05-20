@@ -172,7 +172,8 @@ Route::middleware(['admin'])->group(function(){
     // Mengupdate status pesanan
     Route::put('/admin/pesanan/{id}', [PesananController::class, 'update'])->name('admin.pesanan.update');
     Route::delete('/admin/pesanan/{id}', [PesananController::class, 'destroy'])->name('admin.pesanan.destroy');
-
+    // Resi
+    Route::post('/admin/pesanan/{id}/resi', [PesananController::class, 'inputResi'])->name('admin.pesanan.resi');
 
 
     // Profile

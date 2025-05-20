@@ -51,4 +51,29 @@ class PesananController extends Controller
         }
     }
 
+    
+    // Resi
+   public function inputResi(Request $request, $id)
+    {
+        \Log::info('Input Resi Request:', $request->all()); // untuk memastikan request terkirim
+
+        $request->validate([
+            'resi' => 'required|string|max:255',
+        ]);
+
+    $pesanan = Pesanan::find($id);
+
+    if (!$pesanan) {
+        return redirect()->back()->with('error', 'Pesanan tidak ditemukan.');
+    }
+
+    $pesanan->resi = $request->resi;
+    $pesanan->save();
+
+    return redirect()->back()->with('success', 'Nomor resi berhasil disimpan.');
+}
+
+
+
+
 }

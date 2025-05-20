@@ -41,7 +41,7 @@ class UserProfileController extends Controller
             return redirect()->route('user.login.form');
         }
 
-        $pesanans = Pesanan::with(['status', 'produk', 'user'])->where('id_user', session('user_id'))->orderBy('tanggal_pesanan', 'desc')->get();
+        $pesanans = Pesanan::with(['status', 'produk', 'user', 'resi'])->where('id_user', session('user_id'))->orderBy('tanggal_pesanan', 'desc')->get();
 
         return view('user.orders', compact('pesanans'));
     }

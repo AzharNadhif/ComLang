@@ -15,6 +15,7 @@
                         <!-- <th>Email</th> -->
                         <th>Address</th>
                         <th>Zip Code</th>
+                        <th>Nomor Resi</th>
                         <th>Total</th>
                         <th>Status</th>
                     </tr>
@@ -34,6 +35,19 @@
                             <!-- <td>{{ $order->user->email ?? '-' }}</td> -->
                             <td>{{ $order->alamat }}</td>
                             <td>{{ $order->kode_pos }}</td>
+                            <td>
+                                 @if($order->resi)
+                                     <div>{{ $order->resi }}</div>
+                                         {{-- <button class="btn btn-sm btn-info track-button" 
+                                            data-toggle="modal" 
+                                            ata-target="#trackingModal" 
+                                            data-resi="{{ $p->nomor_resi }}">
+                                                    Lacak
+                                         </button> --}}
+                                @else
+                                     <span class="text-muted">Belum tersedia</span>
+                                 @endif
+                            </td>
                             <td>Rp {{ number_format($order->total, 0, ',', '.') }}</td>
                             <td>
                                 <span class="badge

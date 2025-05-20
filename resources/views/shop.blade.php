@@ -32,39 +32,7 @@
 
     <!-- header area start -->
     <header class="header-area">
-        <!-- <div class="gota_top bg-soft d-none d-sm-block">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
-                            <div class="gota_lang">
-                                <ul>
-                                    <li><a href="#">usd<i class="fal fa-chevron-down"></i></a>
-                                        <ul class="additional_dropdown">
-                                            <li><a href="#">euro</a></li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="#">english<i class="fal fa-chevron-down"></i></a>
-                                        <ul class="additional_dropdown">
-                                            <li><a href="#">frences</a></li>
-                                            <li><a href="#">japanes</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 offset-xl-5 col-lg-6 col-md-6 col-sm-6 text-end">
-                            <div class="gota_right">
-                                <ul>
-                                     <li><a href="cart.html">Wishlist</a></li>
-                                    <li><a href="login.html">Account</a></li>
-                                    <li><a href="checkout.html">Checkout</a></li>
-                                    <li><a href="login.html">Login & register</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
+        
         <div class="gota_bottom position-relative">
             <div class="container-fluid">
                 <div class="row align-items-center">
@@ -291,41 +259,41 @@
     </div>
 
     <!-- shop page start -->
-    <div class="shop-page pt-85">
-        <div class="container">
-            <div class="row">
-                <div class="col-xl-3 col-lg-4 col-md-12">
-                    <div class="sidebar">
-                        <div class="product-widget">
-                            <h3 class="widget-title mb-30">Product categories</h3>
-<ul class="product-categories">
-    <li>
-        <a href="javascript:void(0)" class="filter-kategori" data-id="all">
-            All Categories <span>({{ $totalProduk }})</span>
-        </a>
-    </li>
-    @foreach($kategoriCounts as $kategori)
-        <li>
-            <a href="javascript:void(0)" class="filter-kategori" data-id="{{ $kategori->id_kategori }}">
-                {{ $kategori->kategori }} <span>({{ $kategori->products_count }})</span>
-            </a>
-        </li>
-    @endforeach
-</ul>
-
-                        </div>
+<div class="shop-page pt-85">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-3 col-lg-4 col-md-12">
+                <div class="sidebar">
+                    <div class="product-widget">
+                        <h3 class="widget-title mb-30">Product categories</h3>
+                        <ul class="product-categories">
+                            <li>
+                                <a href="javascript:void(0)" class="filter-kategori" data-id="all">
+                                    All Categories <span>({{ $totalProduk }})</span>
+                                </a>
+                            </li>
+                            @foreach($kategoriCounts as $kategori)
+                                <li>
+                                    <a href="javascript:void(0)" class="filter-kategori" data-id="{{ $kategori->id_kategori }}">
+                                        {{ $kategori->kategori }} <span>({{ $kategori->products_count }})</span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
-                <div class="col-xl-9 col-lg-8 col-md-9 col-sm-12">
-                    <div class="shop-top-bar position-relative">
-                        <div class="showing-result">
-                            <p id="jumlah-produk">Showing all {{ $totalProduk }} results</p>
-                        </div>
+            </div>
+            <div class="col-xl-9 col-lg-8 col-md-9 col-sm-12">
+                <div class="shop-top-bar position-relative">
+                    <div class="showing-result">
+                        <p id="jumlah-produk">Showing all {{ $totalProduk }} results</p>
                     </div>
+                </div>
 <div class="tab-pane fade show active" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
 <div class="row" id="produk-container">
     
 @foreach ($produks as $produk)
+    @if($produk->stok > 0)
     <div class="col-xl-4">
         <div class="product product-4">
             <div class="product__thumb">
@@ -355,6 +323,7 @@
             </div>
         </div>
     </div>
+    @endif
 @endforeach
 
                                             
@@ -601,72 +570,97 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
        
-        <script>
-document.querySelectorAll('.filter-kategori').forEach(item => {
-    item.addEventListener('click', function () {
-        const id = this.getAttribute('data-id');
-        const url = id === 'all' ? '/shop/all' : `/shop/filter/${id}`;
+<script>
+    document.querySelectorAll('.filter-kategori').forEach(item => {
+        item.addEventListener('click', function () {
+            const id = this.getAttribute('data-id');
+            const url = id === 'all' ? '/shop/all' : `/shop/filter/${id}`;
 
-fetch(url)
-    .then(res => res.json())
-    .then(res => {
-        const container = document.querySelector('#produk-container');
-        container.innerHTML = '';
+            fetch(url)
+                .then(res => res.json())
+                .then(res => {
+                    const container = document.querySelector('#produk-container');
+                    container.innerHTML = '';
 
-        res.data.forEach(produk => {
-            const harga = parseInt(produk.harga).toLocaleString('id-ID');
-            const kategori = produk.kategori?.kategori || '-';
-            const gambar = produk.gambar;
-            const nama = produk.nama_produk;
-            const idProduk = produk.id_produk;
-
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-            const addToCart = userLoggedIn
-                ? `
-                    <form action="/keranjang/tambah/${idProduk}" method="POST">
-                        <input type="hidden" name="_token" value="${csrfToken}">
-                        <button type="submit" class="p-absoulute pr-2" style="border: none; background: none; color: #000;">add to cart</button>
-                    </form>
-                `
-                : `
-                    <form>
-                        <a href="/user/login" class="p-absoulute pr-2">add to cart</a>
-                    </form>
-                `;
-
-            container.innerHTML += `
-                <div class="col-xl-4">
-                    <div class="product product-4">
-                        <div class="product__thumb">
-                            <a href="/produk/${idProduk}">
-                                <img class="product-primary" src="/images/produk/${gambar}" alt="${nama}" style="width: 100%; height: 300px; object-fit: cover;">
-                                <img class="product-secondary" src="/images/produk/${gambar}" alt="${nama}">
-                            </a>
-                            <div class="product-info mb-10">
-                                <div class="product_category">
-                                    <span>${kategori}</span>
+                    if (res.data.length === 0) {
+                        // Tampilkan pesan jika tidak ada produk
+                        container.innerHTML = `
+                            <div class="col-12 text-center mt-4">
+                                <div class="alert alert-info">
+                                    Tidak ada produk yang tersedia untuk kategori ini.
                                 </div>
                             </div>
-                            <div class="product__name">
-                                <h4><a href="#">${nama}</a></h4>
-                                <div class="pro-price">
-                                    <p class="p-absoulute pr-1">Rp ${harga}</p>
-                                    ${addToCart}
-                                </div>
+                        `;
+                    } else {
+                        // Tampilkan produk yang tersedia
+                        res.data.forEach(produk => {
+                            // Pemeriksaan stok sebenarnya sudah dilakukan di backend,
+                            // tapi kita bisa double-check di sini juga untuk keamanan
+                            if (produk.stok > 0) {
+                                const harga = parseInt(produk.harga).toLocaleString('id-ID');
+                                const kategori = produk.kategori?.kategori || '-';
+                                const gambar = produk.gambar;
+                                const nama = produk.nama_produk;
+                                const idProduk = produk.id_produk;
+
+                                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                                const addToCart = userLoggedIn
+                                    ? `
+                                        <form action="/keranjang/tambah/${idProduk}" method="POST">
+                                            <input type="hidden" name="_token" value="${csrfToken}">
+                                            <button type="submit" class="p-absoulute pr-2" style="border: none; background: none; color: #000;">add to cart</button>
+                                        </form>
+                                    `
+                                    : `
+                                        <form>
+                                            <a href="/user/login" class="p-absoulute pr-2">add to cart</a>
+                                        </form>
+                                    `;
+
+                                container.innerHTML += `
+                                    <div class="col-xl-4">
+                                        <div class="product product-4">
+                                            <div class="product__thumb">
+                                                <a href="/produk/${idProduk}">
+                                                    <img class="product-primary" src="/images/produk/${gambar}" alt="${nama}" style="width: 100%; height: 300px; object-fit: cover;">
+                                                    <img class="product-secondary" src="/images/produk/${gambar}" alt="${nama}">
+                                                </a>
+                                                <div class="product-info mb-10">
+                                                    <div class="product_category">
+                                                        <span>${kategori}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="product__name">
+                                                    <h4><a href="#">${nama}</a></h4>
+                                                    <div class="pro-price">
+                                                        <p class="p-absoulute pr-1">Rp ${harga}</p>
+                                                        ${addToCart}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        });
+                    }
+
+                    document.getElementById('jumlah-produk').innerText = `Showing all ${res.data.length} results`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const container = document.querySelector('#produk-container');
+                    container.innerHTML = `
+                        <div class="col-12 text-center mt-4">
+                            <div class="alert alert-danger">
+                                Terjadi kesalahan saat memuat produk. Silakan coba lagi.
                             </div>
                         </div>
-                    </div>
-                </div>
-            `;
+                    `;
+                });
         });
-
-        document.getElementById('jumlah-produk').innerText = `Showing all ${res.data.length} results`;
     });
-
-    });
-});
-
 </script>
     <script>
 function toggleCart() {
