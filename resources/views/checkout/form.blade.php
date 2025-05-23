@@ -44,12 +44,12 @@
 
                         <div class="mb-3">
                             <label class="form-label">Whatsapp Number</label>
-                            <input type="text" name="whatsapp" class="form-control" required>
+                            <input type="number" name="whatsapp" class="form-control" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Zip Code</label>
-                            <input type="text" name="kode_pos" class="form-control" required>
+                            <input type="number" name="kode_pos" class="form-control" required>
                         </div>
 
                         <div class="mb-3">
