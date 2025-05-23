@@ -331,74 +331,76 @@
     </div>
     <!-- product show case area end  -->
 
-<!-- categories area start -->
-<div class="categories_area pt-85 mb-150">
-    <div class="container-fluid">
-        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-            <div class="section-wrapper text-center mb-35">
-                <h2 class="section-title">product recommendations</h2>
-                <p>Products you might like based on your<br>
-                    shopping history.</p>
-            </div>
-        </div>
-        <div class="row">
+    <!-- categories area start -->
+    <div class="categories_area pt-85 mb-150">
+        <div class="container-fluid">
             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-                <div class="categories__tab">
-                    <div class="tab-content" id="myTabContent">
-                        <div class="tab-pane fade show active" id="home">
-                            <div class="container">
-                                <div class="product-active h-2-product-active swiper-container">
-                                    <div class="swiper-wrapper">
-                                        @forelse($rekomendasi as $key => $item)
-                                            <div class="product-item swiper-slide wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.{{ $key + 2 }}s">
-                                                <div class="product">
-                                                    <div class="product__thumb">
-                                                        <a href="{{ route('produk.detail', $item->id_produk) }}">
-                                                            <img class="product-primary" src="{{ asset('images/produk/' . $item->gambar) }}" alt="{{ $item->nama_produk }}">
-                                                            <img class="product-secondary" src="{{ asset('images/produk/' . $item->gambar) }}" alt="{{ $item->nama_produk }}">
-                                                        </a>
-                                                        <div class="product__update">
-                                                            <a class="#">for you</a>
-                                                        </div>
-                                                        <div class="product-info mb-10">
-                                                            <div class="product_category">
-                                                                <span>{{ $item->kategori->kategori ?? '-' }}</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="product__name">
-                                                            <h4><a href="{{ route('produk.detail', $item->id_produk) }}">{{ $item->nama_produk }}</a></h4>
-                                                            <div class="pro-price">
-                                                                <p class="p-absoulute pr-1"><span>Rp.</span>{{ number_format($item->harga, 0, ',', '.') }}</p>
-                                                                    <form action="{{ route('keranjang.tambah', $item->id_produk) }}" method="POST">
-                                                                        @csrf
-                                                                        @if (session('user_logged_in'))
-                                                                            <button type="submit" class="p-absoulute pr-2" style="border: none; background: none; color: #000;">add to cart</button>
-                                                                        @else
-                                                                            <a href="{{ route('user.login.form') }}" class="p-absoulute pr-2">add to cart</a>
-                                                                        @endif
-                                                                    </form>
+                <div class="section-wrapper text-center mb-35">
+                    <h2 class="section-title">product recommendations</h2>
+                    <p>Products you might like based on your<br>
+                        shopping history.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                    <div class="categories__tab">
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade show active" id="home">
+                                <div class="container">
+                                    <div class="product-active h-2-product-active swiper-container">
+                                        <div class="swiper-wrapper">
+                                            @forelse($rekomendasi as $key => $item)
+                                                @if($item->stok > 0)
+                                                    <div class="product-item swiper-slide wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.{{ $key + 2 }}s">
+                                                        <div class="product">
+                                                            <div class="product__thumb">
+                                                                <a href="{{ route('produk.detail', $item->id_produk) }}">
+                                                                    <img class="product-primary img-fluid object-fit-cover w-100" style="height: 400px;" src="{{ asset('images/produk/' . $item->gambar) }}" alt="{{ $item->nama_produk }}">
+                                                                    <img class="product-secondary img-fluid object-fit-cover w-100" style="height: 400px;" src="{{ asset('images/produk/' . $item->gambar) }}" alt="{{ $item->nama_produk }}">
+                                                                </a>
+                                                                <div class="product__update">
+                                                                    <a class="#">for you</a>
+                                                                </div>
+                                                                <div class="product-info mb-10">
+                                                                    <div class="product_category">
+                                                                        <span>{{ $item->kategori->kategori ?? '-' }}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="product__name">
+                                                                    <h4><a href="{{ route('produk.detail', $item->id_produk) }}">{{ $item->nama_produk }}</a></h4>
+                                                                    <div class="pro-price">
+                                                                        <p class="p-absoulute pr-1"><span>Rp.</span>{{ number_format($item->harga, 0, ',', '.') }}</p>
+                                                                            <form action="{{ route('keranjang.tambah', $item->id_produk) }}" method="POST">
+                                                                                @csrf
+                                                                                @if (session('user_logged_in'))
+                                                                                    <button type="submit" class="p-absoulute pr-2" style="border: none; background: none; color: #000;">add to cart</button>
+                                                                                @else
+                                                                                    <a href="{{ route('user.login.form') }}" class="p-absoulute pr-2">add to cart</a>
+                                                                                @endif
+                                                                            </form>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                @endif
+                                            @empty
+                                                <div class="w-100 text-center py-5">
+                                                    <p class="fs-5"><a href="{{ route('shop') }}" style="text-decoration: underline;">Please shop first in order to get interesting recommendations from us.</a></p>
                                                 </div>
-                                            </div>
-                                        @empty
-                                            <div class="w-100 text-center py-5">
-                                                <p class="fs-5"><a href="{{ route('shop') }}" style="text-decoration: underline;">Please shop first in order to get interesting recommendations from us.</a></p>
-                                            </div>
-                                        @endforelse
-                                    </div> <!-- end .swiper-wrapper -->
-                                </div> <!-- end .swiper-container -->
-                            </div> <!-- end .container -->
-                        </div> <!-- end .tab-pane -->
-                    </div> <!-- end .tab-content -->
-                </div> <!-- end .categories__tab -->
+                                            @endforelse
+                                        </div> <!-- end .swiper-wrapper -->
+                                    </div> <!-- end .swiper-container -->
+                                </div> <!-- end .container -->
+                            </div> <!-- end .tab-pane -->
+                        </div> <!-- end .tab-content -->
+                    </div> <!-- end .categories__tab -->
+                </div>
+                
             </div>
-            
         </div>
     </div>
-</div>
-<!-- categories area end -->
+    <!-- categories area end -->
 
 
     <!-- new product area start -->

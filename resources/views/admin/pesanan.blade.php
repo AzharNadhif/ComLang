@@ -21,8 +21,8 @@
                         <th>Penerima</th>
                         <th>No WhatsApp</th>
                         <th>Kode Pos</th>
-                        <th>Nomor Resi</th>
                         <th>Actions</th>
+                        <th>Nomor Resi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -97,6 +97,14 @@
 
                                 <!-- ZIP Code -->
                                 <td>{{ $order->kode_pos ?? '-' }}</td>
+                                {{-- Update Status --}}
+                                <td>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPesananModal{{ $order->id_pesanan }}">
+                                        <i class="bi bi-pencil-square"></i> Update Status
+                                    </button>
+                                </td>
+
+                                {{-- resi --}}
                                <td>
                                     <span class="badge bg-success">{{ $order->resi ?? 'Belum Ada Resi' }}</span>
 
@@ -126,15 +134,6 @@
                                             </div>
                                         </div>
                                     </div>
-</td>
-
-
-
-
-                                <td>
-                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPesananModal{{ $order->id_pesanan }}">
-                                        <i class="bi bi-pencil-square"></i> Update Status
-                                    </button>
                                 </td>
                             </tr>
                         @endforeach
