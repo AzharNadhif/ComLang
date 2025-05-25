@@ -11,9 +11,20 @@ use App\Models\PesananDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Midtrans\Config;
+use Midtrans\Snap;
+use Midtrans\Notification;
 
 class CheckoutController extends Controller
 {
+    public function __construct()
+    {
+        // Set konfigurasi Midtrans
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = config('midtrans.is_sanitized');
+        Config::$is3ds = config('midtrans.is_3ds');
+    }
     
     // Langkah 1: Form penerima
     public function form($id_produk)
@@ -32,7 +43,7 @@ class CheckoutController extends Controller
         return view('checkout.form', compact('produk'));
     }
 
-    // Simpan data pesanan lalu redirect ke halaman upload
+    // Simpan data pesanan lalu redirect ke halaman pembayaran Midtrans
     public function simpanPesanan(Request $request)
     {
         if (!session('user_logged_in')) {
@@ -54,6 +65,7 @@ class CheckoutController extends Controller
             return redirect()->back()->with('error', 'Stok produk tidak tersedia.');
         }
 
+        // Buat pesanan dengan status pending
         $pesanan = Pesanan::create([
             'id_user' => session('user_id'),
             'id_produk' => $produk->id_produk,
@@ -66,86 +78,50 @@ class CheckoutController extends Controller
             'kode_pos' => $request->kode_pos,
         ]);
 
-        return redirect()->route('checkout.upload', $pesanan->id_pesanan);
-    }
+        // Buat Snap Token untuk Midtrans
+        $params = [
+            'transaction_details' => [
+                'order_id' => 'ORDER-' . $pesanan->id_pesanan . '-' . time(),
+                'gross_amount' => $produk->harga,
+            ],
+            'customer_details' => [
+                'first_name' => $request->nama,
+                'phone' => $request->whatsapp,
+            ],
+            'item_details' => [
+                [
+                    'id' => $produk->id_produk,
+                    'price' => $produk->harga,
+                    'quantity' => 1,
+                    'name' => $produk->nama_produk
+                ]
+            ],
+        ];
 
-
-    // Langkah 2: Form upload bukti
-    public function uploadBukti($id_pesanan)
-    {
-        if (!session('user_logged_in')) {
-            return redirect()->route('user.login.form')->withErrors(['login' => 'Silakan login terlebih dahulu.']);
-        }
-
-        $pesanan = Pesanan::with('pembayaran')->findOrFail($id_pesanan);
-        return view('checkout.upload', compact('pesanan'));
-    }
-
-    // Simpan bukti bayar dan kurangi stok
-    public function simpanBukti(Request $request)
-    {
-        if (!session('user_logged_in')) {
-            return redirect()->route('user.login.form')->withErrors(['login' => 'Silakan login terlebih dahulu.']);
-        }
-        
-        $request->validate([
-            'id_pesanan' => 'required|exists:pesanan,id_pesanan',
-            'bukti_bayar' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-
-        $pesanan = Pesanan::findOrFail($request->id_pesanan);
-
-        // Gunakan transaksi database untuk memastikan konsistensi data
-        DB::beginTransaction();
-        
         try {
-            // Cari produk dan kurangi stok
-            $produk = Produk::findOrFail($pesanan->id_produk);
+            $snapToken = Snap::getSnapToken($params);
             
-            // Cek stok sekali lagi sebelum mengurangi
-            if ($produk->stok <= 0) {
-                throw new \Exception('Stok produk tidak tersedia.');
-            }
-            
-            // Kurangi stok
-            $produk->stok = $produk->stok - 1;
-            $produk->save();
-
-            // Upload bukti pembayaran
-            $file = $request->file('bukti_bayar');
-            $namaFile = 'bukti_transfer_' . $pesanan->id_pesanan . '.' . $file->getClientOriginalExtension();
-            $path = 'images/bukti_bayar/' . $namaFile;
-            $file->move(public_path('images/bukti_bayar'), $namaFile);
-            
-            // Simpan data pembayaran
+            // Simpan snap token ke database pembayaran
             Pembayaran::create([
                 'id_pesanan' => $pesanan->id_pesanan,
                 'jumlah_bayar' => $pesanan->total,
-                'bukti_bayar' => $path,
+                'snap_token' => $snapToken,
+                'status' => 'pending',
             ]);
-            
-            // Commit transaksi jika semua berhasil
-            DB::commit();
-            
-            return redirect()->route('user.orders')->with('success', 'Pembayaran berhasil diunggah dan stok produk telah diperbarui!');
+
+            return view('checkout.payment', compact('pesanan', 'snapToken'));
             
         } catch (\Exception $e) {
-            // Rollback transaksi jika terjadi error
-            DB::rollBack();
-            
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat pembayaran: ' . $e->getMessage());
         }
     }
 
+    // Proses checkout dari keranjang
     public function prosesCart(Request $request)
     {
         if (!session('user_logged_in')) {
             return redirect()->route('user.login.form')->with('error', 'Silakan login terlebih dahulu.');
         }
-
-        $request->validate([
-            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
 
         $pengiriman = session('checkout_cart_pengiriman');
         $id_user = session('user_id');
@@ -166,12 +142,6 @@ class CheckoutController extends Controller
                 }
             }
             
-            // Proses upload bukti pembayaran
-            $file = $request->file('bukti_pembayaran');
-            $filename = 'bukti_transfer_' . time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('images/bukti_bayar'), $filename);
-            $buktiPath = 'images/bukti_bayar/' . $filename;
-            
             // Buat pesanan utama
             $pesanan = Pesanan::create([
                 'id_user' => $id_user,
@@ -184,7 +154,8 @@ class CheckoutController extends Controller
                 'kode_pos' => $pengiriman['kode_pos'],
             ]);
             
-            // Tambahkan detail produk dan kurangi stok
+            // Tambahkan detail produk
+            $itemDetails = [];
             foreach ($items as $item) {
                 // Tambahkan ke tabel pesanan_detail
                 PesananDetail::create([
@@ -192,33 +163,145 @@ class CheckoutController extends Controller
                     'id_produk' => $item->id_produk,
                 ]);
                 
-                // Kurangi stok produk
-                $produk = Produk::findOrFail($item->id_produk);
-                $produk->stok = $produk->stok - 1;
-                $produk->save();
+                // Siapkan item details untuk Midtrans
+                $itemDetails[] = [
+                    'id' => $item->id_produk,
+                    'price' => $item->produk->harga,
+                    'quantity' => 1,
+                    'name' => $item->produk->nama_produk
+                ];
             }
             
-            // Simpan bukti pembayaran
+            // Parameter untuk Midtrans
+            $params = [
+                'transaction_details' => [
+                    'order_id' => 'CART-ORDER-' . $pesanan->id_pesanan . '-' . time(),
+                    'gross_amount' => $totalPesanan,
+                ],
+                'customer_details' => [
+                    'first_name' => $pengiriman['nama'],
+                    'phone' => $pengiriman['whatsapp'],
+                ],
+                'item_details' => $itemDetails,
+            ];
+
+            $snapToken = Snap::getSnapToken($params);
+            
+            // Simpan pembayaran
             Pembayaran::create([
                 'id_pesanan' => $pesanan->id_pesanan,
                 'jumlah_bayar' => $totalPesanan,
-                'bukti_bayar' => $buktiPath,
+                'snap_token' => $snapToken,
+                'status' => 'pending',
             ]);
             
-            // Kosongkan keranjang
+            // Commit transaksi
+            DB::commit();
+            
+            // Kosongkan keranjang setelah berhasil
             Keranjang::where('id_user', $id_user)->delete();
             session()->forget('checkout_cart_pengiriman');
             
-            // Commit transaksi jika semua berhasil
-            DB::commit();
-            
-            return redirect()->route('user.orders')->with('success', 'Pesanan berhasil dibuat dan stok produk telah diperbarui.');
+            return view('checkout.payment', compact('pesanan', 'snapToken'));
             
         } catch (\Exception $e) {
             // Rollback jika terjadi error
             DB::rollBack();
             
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    // Callback dari Midtrans
+    public function callback(Request $request)
+    {
+        try {
+            $notification = new Notification();
+            
+            $orderId = $notification->order_id;
+            $statusCode = $notification->status_code;
+            $grossAmount = $notification->gross_amount;
+            $transactionStatus = $notification->transaction_status;
+            $fraudStatus = $notification->fraud_status ?? null;
+            
+            // Cari pembayaran berdasarkan order_id
+            $pembayaran = Pembayaran::whereHas('pesanan', function($query) use ($orderId) {
+                $query->whereRaw("CONCAT('ORDER-', id_pesanan, '-', UNIX_TIMESTAMP(created_at)) = ? OR CONCAT('CART-ORDER-', id_pesanan, '-', UNIX_TIMESTAMP(created_at)) = ?", [$orderId, $orderId]);
+            })->first();
+            
+            if (!$pembayaran) {
+                return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
+            }
+            
+            $pesanan = $pembayaran->pesanan;
+            
+            DB::beginTransaction();
+            
+            try {
+                if ($transactionStatus == 'capture') {
+                    if ($fraudStatus == 'challenge') {
+                        $pembayaran->status = 'challenge';
+                        $pesanan->id_status = 1; // Menunggu konfirmasi
+                    } else if ($fraudStatus == 'accept') {
+                        $pembayaran->status = 'success';
+                        $pesanan->id_status = 2; // Dikonfirmasi
+                        $this->reduceStock($pesanan);
+                    }
+                } else if ($transactionStatus == 'settlement') {
+                    $pembayaran->status = 'success';
+                    $pesanan->id_status = 2; // Dikonfirmasi
+                    $this->reduceStock($pesanan);
+                } else if ($transactionStatus == 'pending') {
+                    $pembayaran->status = 'pending';
+                    $pesanan->id_status = 1; // Menunggu konfirmasi
+                } else if ($transactionStatus == 'deny') {
+                    $pembayaran->status = 'failed';
+                    $pesanan->id_status = 4; // Dibatalkan
+                } else if ($transactionStatus == 'expire') {
+                    $pembayaran->status = 'expired';
+                    $pesanan->id_status = 4; // Dibatalkan
+                } else if ($transactionStatus == 'cancel') {
+                    $pembayaran->status = 'cancelled';
+                    $pesanan->id_status = 4; // Dibatalkan
+                }
+                
+                $pembayaran->save();
+                $pesanan->save();
+                
+                DB::commit();
+                
+                return response()->json(['status' => 'success']);
+                
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+            }
+            
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
+    
+    // Helper function untuk mengurangi stok
+    private function reduceStock($pesanan)
+    {
+        if ($pesanan->id_produk) {
+            // Single product order
+            $produk = Produk::find($pesanan->id_produk);
+            if ($produk && $produk->stok > 0) {
+                $produk->stok = $produk->stok - 1;
+                $produk->save();
+            }
+        } else {
+            // Cart order - reduce stock for all items
+            $details = PesananDetail::where('id_pesanan', $pesanan->id_pesanan)->get();
+            foreach ($details as $detail) {
+                $produk = Produk::find($detail->id_produk);
+                if ($produk && $produk->stok > 0) {
+                    $produk->stok = $produk->stok - 1;
+                    $produk->save();
+                }
+            }
         }
     }
 
@@ -243,17 +326,36 @@ class CheckoutController extends Controller
             return redirect()->route('user.login.form')->with('error', 'Silakan login terlebih dahulu.');
         }
 
+        $request->validate([
+            'nama' => 'required|string',
+            'whatsapp' => 'required|string',
+            'alamat' => 'required|string',
+            'kode_pos' => 'required|string',
+        ]);
+
         // Simpan data pengiriman sementara di session
         session([
             'checkout_cart_pengiriman' => [
                 'nama' => $request->nama,
                 'whatsapp' => $request->whatsapp,
-                'email' => $request->email,
                 'alamat' => $request->alamat,
                 'kode_pos' => $request->kode_pos,
             ]
         ]);
 
-        return view('checkout.cart-upload');
+        // Langsung proses ke Midtrans
+        return $this->prosesCart($request);
+    }
+    
+    // Halaman sukses setelah pembayaran
+    public function success($id_pesanan)
+    {
+        if (!session('user_logged_in')) {
+            return redirect()->route('user.login.form')->with('error', 'Silakan login terlebih dahulu.');
+        }
+        
+        $pesanan = Pesanan::with('pembayaran')->findOrFail($id_pesanan);
+        
+        return view('checkout.success', compact('pesanan'));
     }
 }

@@ -61,6 +61,8 @@ Route::get('/checkout/{id_produk}', [CheckoutController::class, 'form'])->name('
 Route::post('/checkout/simpan', [CheckoutController::class, 'simpanPesanan'])->name('checkout.simpan');
 Route::get('/checkout/upload/{id}', [CheckoutController::class, 'uploadBukti'])->name('checkout.upload');
 Route::post('/checkout/upload', [CheckoutController::class, 'simpanBukti'])->name('checkout.upload.simpan');
+Route::post('/midtrans/callback', [CheckoutController::class, 'callback'])->name('midtrans.callback');
+Route::get('/checkout/success/{id_pesanan}', [CheckoutController::class, 'success'])->name('checkout.success');
 
 // Route login user
 Route::get('/user/login', [UserAuthController::class, 'formLogin'])->name('user.login.form');
