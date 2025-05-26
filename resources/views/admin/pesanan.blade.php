@@ -14,7 +14,7 @@
                         <th>Status</th>
                         <th>Total</th>
                         <th>Amount Paid</th>
-                        <th>Payment Screenshot</th>
+                        {{-- <th>Payment Screenshot</th> --}}
                         <th>Order Date</th>
                         <th>Address</th>
                         <th>Produk</th>
@@ -47,74 +47,45 @@
                                     <span class="text-danger">Belum dibayar</span>
                                 @endif
                             </td>
+                            
+                           
+                            <!-- Tanggal Pesanan -->
+                            <td>{{ date('d-m-Y', strtotime($order->tanggal_pesanan)) }}</td>
+                            <td>{{ $order->alamat }}</td>
+                            <!-- Produk -->
                             <td>
-                    @if($order->pembayaran && $order->pembayaran->bukti_bayar)
-                        <div class="d-flex gap-1">
-                            {{-- Tombol Lihat --}}
-                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#buktiModal{{ $order->id_pesanan }}">
-                                <i class="bi bi-image"></i> Lihat Bukti
-                            </button>
-
-                            {{-- Tombol Download --}}
-                            <a href="{{ asset($order->pembayaran->bukti_bayar) }}" download class="btn btn-success btn-sm">
-                                <i class="bi bi-download"></i> Download
-                            </a>
-                        </div>
-
-                        {{-- Modal untuk lihat bukti --}}
-                        <div class="modal fade" id="buktiModal{{ $order->id_pesanan }}" tabindex="-1" aria-labelledby="buktiModalLabel{{ $order->id_pesanan }}" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-body text-center">
-                                        <img src="{{ asset($order->pembayaran->bukti_bayar) }}" class="img-fluid rounded" alt="Bukti Pembayaran">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <span class="text-danger">Tidak ada</span>
-                    @endif
+                                @if($order->detail && $order->detail->count())
+                                    {{ $order->detail->pluck('produk.nama_produk')->join(', ') }}
+                                @else
+                                    {{ $order->produk->nama_produk ?? '-' }}
+                                @endif
+                            </td>
 
 
-                                </td>
-                                <td>{{ date('d-m-Y', strtotime($order->tanggal_pesanan)) }}</td>
-                                <td>{{ $order->alamat }}</td>
-                                <!-- Produk -->
-                                <td>
-                                    @if($order->detail && $order->detail->count())
-                                        {{ $order->detail->pluck('produk.nama_produk')->join(', ') }}
-                                    @else
-                                        {{ $order->produk->nama_produk ?? '-' }}
-                                    @endif
-                                </td>
+                            <!-- Nama Penerima -->
+                            <td>{{ $order->nama_penerima ?? '-' }}</td>
 
+                            <!-- No WhatsApp -->
+                            <td>{{ $order->whatsapp ?? '-' }}</td>
 
-                                <!-- Nama Penerima -->
-                                <td>{{ $order->nama_penerima ?? '-' }}</td>
+                            <!-- ZIP Code -->
+                            <td>{{ $order->kode_pos ?? '-' }}</td>
+                            {{-- Update Status --}}
+                            <td>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPesananModal{{ $order->id_pesanan }}">                                        <i class="bi bi-pencil-square"></i> Update Status
+                                </button>
+                            </td>
 
-                                <!-- No WhatsApp -->
-                                <td>{{ $order->whatsapp ?? '-' }}</td>
+                            {{-- resi --}}
+                            <td>
+                                <span class="badge bg-success">{{ $order->resi ?? 'Belum Ada Resi' }}</span>
 
-                                <!-- ZIP Code -->
-                                <td>{{ $order->kode_pos ?? '-' }}</td>
-                                {{-- Update Status --}}
-                                <td>
-                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPesananModal{{ $order->id_pesanan }}">
-                                        <i class="bi bi-pencil-square"></i> Update Status
-                                    </button>
-                                </td>
+                                <!-- Tombol buka modal untuk input/edit resi -->
+                                <button class="btn btn-sm btn-outline-primary mt-1" data-bs-toggle="modal" data-bs-target="#resiModal{{ $order->id_pesanan }}"><i class="bi bi-truck"></i> {{ $order->resi ? 'Edit Resi' : 'Input Resi' }}
+                                </button>
 
-                                {{-- resi --}}
-                               <td>
-                                    <span class="badge bg-success">{{ $order->resi ?? 'Belum Ada Resi' }}</span>
-
-                                    <!-- Tombol buka modal untuk input/edit resi -->
-                                    <button class="btn btn-sm btn-outline-primary mt-1" data-bs-toggle="modal" data-bs-target="#resiModal{{ $order->id_pesanan }}">
-                                        <i class="bi bi-truck"></i> {{ $order->resi ? 'Edit Resi' : 'Input Resi' }}
-                                    </button>
-
-                                    <!-- Modal input/edit resi -->
-                                    <div class="modal fade" id="resiModal{{ $order->id_pesanan }}" tabindex="-1" aria-hidden="true">
+                                <!-- Modal input/edit resi -->
+                               <div class="modal fade" id="resiModal{{ $order->id_pesanan }}" tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
                                                 <form method="POST" action="{{ route('admin.pesanan.resi', $order->id_pesanan) }}">
